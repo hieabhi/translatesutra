@@ -41,7 +41,7 @@ function detectOS() {
 
 // Get download links (in production, these would come from a release API)
 function getDownloadLinks() {
-  const baseUrl = 'https://github.com/translatesutra/translatesutra/releases/latest/download';
+  const baseUrl = 'https://github.com/hieabhi/translatesutra/releases/latest/download';
   
   return [
     // Windows
@@ -157,18 +157,61 @@ function handleDownload(url, filename) {
   // Track download analytics (in production)
   console.log('Download started:', { url, filename });
 
-  // Create temporary download link
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  link.style.display = 'none';
-  
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  // Check if release exists, if not redirect to GitHub with instructions
+  fetch(url, { method: 'HEAD' })
+    .then(response => {
+      if (response.ok) {
+        // Release exists, proceed with download
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.style.display = 'none';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showDownloadNotification(filename);
+      } else {
+        // Release doesn't exist yet, redirect to GitHub
+        showBuildInstructions();
+      }
+    })
+    .catch(() => {
+      // Network error or release doesn't exist, redirect to GitHub
+      showBuildInstructions();
+    });
+}
 
-  // Show download notification
-  showDownloadNotification(filename);
+// Show build instructions when releases aren't available
+function showBuildInstructions() {
+  const modal = document.createElement('div');
+  modal.className = 'build-instructions-modal';
+  modal.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🚀 TranslateSutra - Development Version</h3>
+        <button class="modal-close" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Pre-built installers are coming soon!</strong></p>
+        <p>For now, you can build TranslateSutra from source:</p>
+        <ol>
+          <li>Visit our <a href="https://github.com/hieabhi/translatesutra" target="_blank">GitHub Repository</a></li>
+          <li>Clone the repository: <code>git clone https://github.com/hieabhi/translatesutra.git</code></li>
+          <li>Install dependencies: <code>npm install</code></li>
+          <li>Build the Electron app: <code>cd app-electron && npm run build</code></li>
+        </ol>
+        <p>Or try the web version locally by following the setup instructions in the README.</p>
+        <div class="modal-actions">
+          <a href="https://github.com/hieabhi/translatesutra" target="_blank" class="btn-primary">View on GitHub</a>
+          <button onclick="this.parentElement.parentElement.parentElement.parentElement.remove()" class="btn-secondary">Close</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
 }
 
 // Show download notification
