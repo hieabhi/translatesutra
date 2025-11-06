@@ -1,0 +1,27 @@
+{
+  "name": "@translatesutra/web-landing",
+  "version": "1.0.0",
+  "description": "TranslateSutra landing page and web interface",
+  "main": "index.html",
+  "scripts": {
+    "dev": "live-server --port=3001 --host=localhost --entry-file=index.html",
+    "build": "npm run copy-assets && npm run minify",
+    "copy-assets": "mkdir -p dist && cp -r *.html *.css *.js assets dist/ 2>/dev/null || true",
+    "minify": "echo 'Minification not implemented yet'",
+    "serve": "python -m http.server 3001 2>/dev/null || python3 -m http.server 3001 2>/dev/null || npx serve -p 3001",
+    "lint": "echo 'Linting not configured'",
+    "test": "echo 'No tests configured'"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2",
+    "serve": "^14.2.1"
+  },
+  "keywords": [
+    "translator",
+    "landing-page",
+    "download",
+    "web-interface"
+  ],
+  "author": "TranslateSutra Team",
+  "license": "MIT"
+}

@@ -1,0 +1,49 @@
+node_modules/
+dist/
+build/
+coverage/
+*.log
+.env
+.env.local
+.env.production
+*.pid
+*.seed
+*.pid.lock
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Electron
+app-electron/dist/
+app-electron/release/
+app-electron/out/
+
+# Build artifacts
+backend/dist/
+web-landing/dist/
+
+# Test
+coverage/
+.nyc_output
+
+# Temporary
+*.tmp
+*.temp
+
+# Database
+*.db
+*.sqlite
+*.sqlite3

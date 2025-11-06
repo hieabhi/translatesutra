@@ -1,0 +1,57 @@
+{
+  "name": "translate-sutra",
+  "version": "1.0.0",
+  "description": "A floating desktop translator app with one-click download and authentication",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "app-electron",
+    "web-landing"
+  ],
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:electron": "cd app-electron && npm run dev",
+    "dev:web": "cd web-landing && npm run dev",
+    "build:all": "npm run build --workspaces",
+    "test:all": "npm run test --workspaces",
+    "setup": "npm install && npm install --workspaces",
+    "docker:setup": "node -e \"if (!require('fs').existsSync('.env')) require('fs').copyFileSync('.env.example', '.env'); console.log('Environment setup complete!')\"",
+    "docker:up": "docker-compose up -d",
+    "docker:up:full": "docker-compose --profile translation --profile keycloak --profile cache up -d",
+    "docker:up:translation": "docker-compose --profile translation up -d",
+    "docker:up:keycloak": "docker-compose --profile keycloak up -d",
+    "docker:down": "docker-compose --profile translation --profile keycloak --profile cache down",
+    "docker:restart": "npm run docker:down && npm run docker:up",
+    "docker:logs": "docker-compose logs -f",
+    "docker:logs:backend": "docker-compose logs -f backend",
+    "docker:logs:web": "docker-compose logs -f web",
+    "docker:logs:postgres": "docker-compose logs -f postgres",
+    "docker:ps": "docker-compose ps",
+    "docker:clean": "docker-compose --profile translation --profile keycloak --profile cache down -v --remove-orphans",
+    "docker:build": "docker-compose build",
+    "docker:migrate": "docker-compose exec backend npm run migrate"
+  },
+  "keywords": [
+    "translator",
+    "electron",
+    "desktop",
+    "floating",
+    "translation",
+    "libretranslate"
+  ],
+  "author": "TranslateSutra Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
