@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TranslateSutra - Floating Desktop Translator</title>
+    <meta name="description" content="A floating desktop translator app with global hotkey support. Translate text instantly with Ctrl+Shift+T.">
+    <meta name="keywords" content="translator, desktop app, floating, global hotkey, translation, libretranslate">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://translatesutra.com/">
+    <meta property="og:title" content="TranslateSutra - Floating Desktop Translator">
+    <meta property="og:description" content="A floating desktop translator app with global hotkey support. Translate text instantly with Ctrl+Shift+T.">
+    <meta property="og:image" content="https://translatesutra.com/assets/og-image.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://translatesutra.com/">
+    <meta property="twitter:title" content="TranslateSutra - Floating Desktop Translator">
+    <meta property="twitter:description" content="A floating desktop translator app with global hotkey support. Translate text instantly with Ctrl+Shift+T.">
+    <meta property="twitter:image" content="https://translatesutra.com/assets/og-image.png">
+
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="assets/logo.png" alt="TranslateSutra" class="logo-img">
+                <span class="logo-text">TranslateSutra</span>
+            </div>
+            <div class="nav-menu">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#download" class="nav-link">Download</a>
+                <a href="#docs" class="nav-link">Docs</a>
+                <a href="login.html" class="nav-link login-btn">Login</a>
+            </div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Translate Instantly with
+                    <span class="gradient-text">Global Hotkeys</span>
+                </h1>
+                <p class="hero-description">
+                    A floating desktop translator that works with any application. 
+                    Press <kbd>Ctrl+Shift+T</kbd> to translate selected text or clipboard content instantly.
+                </p>
+                <div class="hero-buttons">
+                    <a href="https://github.com/hieabhi/translatesutra/releases/download/v1.0/TranslateSutra-v1.0-Portable.zip" class="btn btn-primary download-btn" id="primaryDownload">
+                        <span class="btn-icon">⬇️</span>
+                        <span class="btn-text">Download v1.0 for Windows</span>
+                    </a>
+                    <a href="#features" class="btn btn-secondary">
+                        <span class="btn-icon">✨</span>
+                        <span class="btn-text">Learn More</span>
+                    </a>
+                </div>
+                <div class="hero-note">
+                    <span class="note-icon">🔒</span>
+                    <span>Free, open-source, and privacy-focused</span>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="app-preview">
+                    <div class="floating-button-demo">
+                        <div class="demo-button">🌐</div>
+                        <div class="demo-tooltip">Press Ctrl+Shift+T</div>
+                    </div>
+                    <div class="translation-window-demo">
+                        <div class="demo-window">
+                            <div class="demo-header">
+                                <span>Translation Result</span>
+                                <button class="demo-close">×</button>
+                            </div>
+                            <div class="demo-content">
+                                <div class="demo-original">Hello world!</div>
+                                <div class="demo-arrow">→</div>
+                                <div class="demo-translated">¡Hola mundo!</div>
+                            </div>
+                            <button class="demo-copy">📋 Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Powerful Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Instant Translation</h3>
+                    <p class="feature-description">
+                        Press Ctrl+Shift+T (Windows/Linux) or Cmd+Shift+T (macOS) to translate text from any application instantly.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Always-on-Top Floating Button</h3>
+                    <p class="feature-description">
+                        Draggable floating button for quick access. Stays visible across all your applications.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3 class="feature-title">Multiple Translation Services</h3>
+                    <p class="feature-description">
+                        Supports LibreTranslate (self-hosted) and external APIs. Your choice for privacy and reliability.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h3 class="feature-title">Privacy & Security</h3>
+                    <p class="feature-description">
+                        Self-host your translation service or use authenticated APIs. Your data stays private.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <h3 class="feature-title">Smart Clipboard Integration</h3>
+                    <p class="feature-description">
+                        Automatically detects clipboard content or selected text. No manual copying required.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3 class="feature-title">Beautiful Interface</h3>
+                    <p class="feature-description">
+                        Clean, modern design with smooth animations. Easy copy, pin, and close controls.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download" class="download">
+        <div class="container">
+            <h2 class="section-title">Download TranslateSutra</h2>
+            <p class="section-description">
+                Choose your platform and start translating instantly. All downloads are free and open-source.
+            </p>
+            
+            <div class="download-cards">
+                <div class="download-card" data-platform="windows">
+                    <div class="platform-icon">🪟</div>
+                    <h3 class="platform-name">Windows</h3>
+                    <p class="platform-desc">Windows 10, 11 (64-bit)</p>
+                    <div class="download-options">
+                        <a href="https://github.com/hieabhi/translatesutra/releases/download/v1.0/TranslateSutra-v1.0-Portable.zip" class="download-link installer" data-file="TranslateSutra-v1.0-Portable.zip">
+                            <span class="download-type">Portable ZIP</span>
+                            <span class="download-size">~50 MB</span>
+                        </a>
+                        <a href="https://github.com/hieabhi/translatesutra/releases/download/v1.0/TranslateSutra-v1.0-Portable.zip" class="download-link portable" data-file="TranslateSutra-v1.0-Portable.zip">
+                            <span class="download-type">Portable v1.0</span>
+                            <span class="download-size">~50 MB</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="download-card" data-platform="macos">
+                    <div class="platform-icon">🍎</div>
+                    <h3 class="platform-name">macOS</h3>
+                    <p class="platform-desc">macOS 10.15+ (Intel & Apple Silicon)</p>
+                    <div class="download-options">
+                        <a href="#" class="download-link dmg" data-file="TranslateSutra.dmg">
+                            <span class="download-type">DMG</span>
+                            <span class="download-size">~50 MB</span>
+                        </a>
+                        <a href="#" class="download-link zip" data-file="TranslateSutra-macOS.zip">
+                            <span class="download-type">ZIP</span>
+                            <span class="download-size">~55 MB</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="download-card" data-platform="linux">
+                    <div class="platform-icon">🐧</div>
+                    <h3 class="platform-name">Linux</h3>
+                    <p class="platform-desc">Ubuntu, Debian, Fedora, etc.</p>
+                    <div class="download-options">
+                        <a href="#" class="download-link appimage" data-file="TranslateSutra.AppImage">
+                            <span class="download-type">AppImage</span>
+                            <span class="download-size">~55 MB</span>
+                        </a>
+                        <a href="#" class="download-link deb" data-file="TranslateSutra.deb">
+                            <span class="download-type">DEB</span>
+                            <span class="download-size">~45 MB</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="download-note">
+                <p>
+                    <strong>Note:</strong> The app requires confirmation to install (OS security feature). 
+                    For production releases, installers will be code-signed for trusted installation.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Install & Run</h3>
+                        <p>Download and install TranslateSutra. A floating button appears on your desktop.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Select or Copy Text</h3>
+                        <p>Select text in any application or copy it to your clipboard.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Press Global Hotkey</h3>
+                        <p>Press <kbd>Ctrl+Shift+T</kbd> (or <kbd>Cmd+Shift+T</kbd> on Mac) from anywhere.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Get Instant Translation</h3>
+                        <p>A beautiful popup shows the translation. Copy, pin, or close as needed.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title">Ready to Start Translating?</h2>
+                <p class="cta-description">
+                    Join thousands of users who translate text instantly with TranslateSutra.
+                </p>
+                <div class="cta-buttons">
+                    <a href="https://github.com/hieabhi/translatesutra/releases/download/v1.0/TranslateSutra-v1.0-Portable.zip" class="btn btn-primary download-btn" id="ctaDownload">
+                        <span class="btn-icon">⬇️</span>
+                        <span class="btn-text">Download Now</span>
+                    </a>
+                    <a href="register.html" class="btn btn-secondary">
+                        <span class="btn-icon">👤</span>
+                        <span class="btn-text">Create Account</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <img src="assets/logo.png" alt="TranslateSutra" class="logo-img">
+                        <span class="logo-text">TranslateSutra</span>
+                    </div>
+                    <p class="footer-description">
+                        Open-source floating desktop translator with global hotkey support.
+                    </p>
+                </div>
+                <div class="footer-section">
+                    <h4 class="footer-title">Product</h4>
+                    <ul class="footer-links">
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#download">Download</a></li>
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Register</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4 class="footer-title">Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="#docs">Documentation</a></li>
+                        <li><a href="https://github.com/hieabhi/translatesutra/issues">Report Bug</a></li>
+                        <li><a href="https://github.com/hieabhi/translatesutra">GitHub</a></li>
+                        <li><a href="mailto:support@translatesutra.com">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4 class="footer-title">Legal</h4>
+                    <ul class="footer-links">
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                        <li><a href="https://github.com/hieabhi/translatesutra/blob/main/LICENSE">License</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 TranslateSutra. Open source under MIT License.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="os-detect.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
