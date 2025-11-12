@@ -5,6 +5,7 @@ import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import { authRouter } from './routes/auth';
 import { deviceRouter } from './routes/device';
+import { translateRouter } from './routes/translate';
 
 // Load environment variables
 dotenv.config();
@@ -65,25 +66,7 @@ app.get('/health', (req, res) => {
 // API routes
 app.use('/auth', authRouter);
 app.use('/device', deviceRouter);
-
-// Translation endpoint (placeholder)
-app.post('/translate', (req, res) => {
-  // TODO: Implement translation logic
-  // This should call LibreTranslate or external translation service
-  const { text, fromLang = 'auto', toLang = 'en' } = req.body;
-  
-  if (!text) {
-    return res.status(400).json({ error: 'Text is required for translation' });
-  }
-  
-  // Placeholder response - replace with actual translation service call
-  res.json({
-    translatedText: `[TRANSLATED: ${text}]`,
-    fromLanguage: fromLang,
-    toLanguage: toLang,
-    service: 'placeholder',
-  });
-});
+app.use('/api', translateRouter);
 
 // 404 handler
 app.use('*', (req, res) => {

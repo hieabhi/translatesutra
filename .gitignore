@@ -31,6 +31,10 @@ app-electron/dist/
 app-electron/release/
 app-electron/out/
 
+# Distribution bundles (do not commit large binaries)
+/TranslateSutra-Portable/
+/TranslateSutra-v*.zip
+
 # Build artifacts
 backend/dist/
 web-landing/dist/

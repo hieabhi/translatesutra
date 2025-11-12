@@ -15,6 +15,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
   pinResultWindow: () => ipcRenderer.invoke('pin-result-window'),
   hideFloatWindow: () => ipcRenderer.invoke('hide-float-window'),
   showFloatWindow: () => ipcRenderer.invoke('show-float-window'),
+  
+  // Context menu and actions
+  showContextMenu: () => ipcRenderer.invoke('show-context-menu'),
+  translateClipboard: () => ipcRenderer.invoke('translate-clipboard'),
+  closeApp: () => ipcRenderer.invoke('close-app'),
+
+  // Language picker
+  closeLanguagePicker: () => ipcRenderer.invoke('close-language-picker'),
+  requestLanguagePickerData: () => ipcRenderer.invoke('request-language-picker-data'),
+  startTranslation: (data: { text: string; from?: string; to: string }) => 
+    ipcRenderer.invoke('start-translation', data),
 
   // Settings
   getSetting: (key: string) => ipcRenderer.invoke('get-setting', key),
@@ -38,6 +49,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   onHideLoading: (callback: () => void) => {
     ipcRenderer.on('hide-loading', () => callback());
+  },
+  onLanguagePickerData: (callback: (data: any) => void) => {
+    ipcRenderer.on('language-picker-data', (event, data) => callback(data));
+  },
+  onLanguageDetected: (callback: (data: any) => void) => {
+    ipcRenderer.on('language-detected', (event, data) => callback(data));
   },
 
   // Remove listeners
