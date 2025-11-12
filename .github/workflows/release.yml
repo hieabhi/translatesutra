@@ -1,0 +1,80 @@
+name: Build and Release (Windows ZIP)
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-windows-zip:
+    name: Build Windows ZIP and upload to Release
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies (root)
+        run: |
+          if (Test-Path package.json) { npm ci } else { echo 'No root package.json' }
+
+      - name: Install dependencies (Electron app)
+        working-directory: app-electron
+        run: |
+          npm ci
+
+      - name: Build TypeScript (Electron)
+        working-directory: app-electron
+        run: |
+          npm run build
+
+      - name: Rebuild native modules for Electron (keytar, etc.)
+        working-directory: app-electron
+        run: |
+          npm run rebuild
+
+      - name: Build Windows ZIP with electron-builder
+        working-directory: app-electron
+        env:
+          CI: true
+        run: |
+          npx electron-builder --win zip --publish never
+
+      - name: Locate artifact
+        id: locate
+        shell: pwsh
+        run: |
+          $zip = Get-ChildItem -Path "app-electron/release" -Filter *.zip | Select-Object -First 1
+          if (-not $zip) { Write-Error 'No ZIP artifact found in app-electron/release'; exit 1 }
+          echo "zip_path=$($zip.FullName)" >> $env:GITHUB_OUTPUT
+
+      - name: Rename artifact to stable name
+        id: rename
+        shell: pwsh
+        run: |
+          $tag = "$env:GITHUB_REF_NAME"  # e.g., v1.0
+          if (-not $tag) { $tag = 'v1.0' }
+          $dst = "TranslateSutra-$tag-Portable.zip"  # e.g., TranslateSutra-v1.0-Portable.zip
+          Copy-Item -Path "${{ steps.locate.outputs.zip_path }}" -Destination $dst -Force
+          echo "release_asset=$dst" >> $env:GITHUB_OUTPUT
+
+      - name: Create GitHub Release (if needed) and upload asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            ${{ steps.rename.outputs.release_asset }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
