@@ -41,23 +41,24 @@ function detectOS() {
 
 // Get download links (in production, these would come from a release API)
 function getDownloadLinks() {
-  const baseUrl = 'https://github.com/hieabhi/translatesutra/releases/latest/download';
+  // Prefer explicit release URLs when known; fallback to latest if you automate renaming
+  const baseUrl = 'https://github.com/hieabhi/translatesutra/releases/download/v1.0';
   
   return [
     // Windows
     {
       platform: 'windows',
       type: 'installer',
-      filename: 'TranslateSutra-Setup.exe',
-      url: `${baseUrl}/TranslateSutra-Setup.exe`,
-      size: '~45 MB'
+      filename: 'TranslateSutra-v1.0-Portable.zip',
+      url: `${baseUrl}/TranslateSutra-v1.0-Portable.zip`,
+      size: '~50 MB'
     },
     {
       platform: 'windows',
       type: 'portable',
-      filename: 'TranslateSutra-Portable.zip',
-      url: `${baseUrl}/TranslateSutra-Portable.zip`,
-      size: '~60 MB'
+      filename: 'TranslateSutra-v1.0-Portable.zip',
+      url: `${baseUrl}/TranslateSutra-v1.0-Portable.zip`,
+      size: '~50 MB'
     },
     
     // macOS
@@ -65,14 +66,14 @@ function getDownloadLinks() {
       platform: 'macos',
       type: 'dmg',
       filename: 'TranslateSutra.dmg',
-      url: `${baseUrl}/TranslateSutra.dmg`,
+  url: `${baseUrl}/TranslateSutra.dmg`,
       size: '~50 MB'
     },
     {
       platform: 'macos',
       type: 'zip',
       filename: 'TranslateSutra-macOS.zip',
-      url: `${baseUrl}/TranslateSutra-macOS.zip`,
+  url: `${baseUrl}/TranslateSutra-macOS.zip`,
       size: '~55 MB'
     },
     
@@ -81,14 +82,14 @@ function getDownloadLinks() {
       platform: 'linux',
       type: 'appimage',
       filename: 'TranslateSutra.AppImage',
-      url: `${baseUrl}/TranslateSutra.AppImage`,
+  url: `${baseUrl}/TranslateSutra.AppImage`,
       size: '~55 MB'
     },
     {
       platform: 'linux',
       type: 'deb',
       filename: 'TranslateSutra.deb',
-      url: `${baseUrl}/TranslateSutra.deb`,
+  url: `${baseUrl}/TranslateSutra.deb`,
       size: '~45 MB'
     }
   ];
