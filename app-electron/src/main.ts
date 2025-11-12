@@ -270,54 +270,81 @@ function sendCopyKeypress(): Promise<void> {
 }
 
 /**
- * Handle translation hotkey - simplified approach using current clipboard
+ * Handle translation trigger: try to capture currently selected text by simulating Ctrl+C,
+ * without permanently altering the user's clipboard. Falls back to existing clipboard if needed.
  */
 async function handleTranslationHotkey(): Promise<void> {
-  console.log('=== Translation hotkey started ===');
+  console.log('=== Translation started ===');
   try {
-    // Get current clipboard content
-    let text = clipboard.readText();
-    console.log('Current clipboard content:', text.substring(0, 100));
-    
-    // If clipboard is empty or very short, show instructional message
-    if (!text || text.trim().length < 3) {
-      console.log('Clipboard is empty or too short');
+    const originalClipboard = clipboard.readText();
+    const beforeHash = hashString(originalClipboard || '');
+
+    // Attempt to copy current selection (Windows only in this implementation)
+    await sendCopyKeypress();
+
+    // Poll the clipboard briefly for a change
+    const copied = await waitForClipboardChange(beforeHash, 600);
+    const candidate = (copied ?? '').trim();
+
+    let text = candidate && candidate.length > 0 ? candidate : (originalClipboard || '').trim();
+
+    // Restore original clipboard so we don't disturb user's clipboard history
+    try { clipboard.writeText(originalClipboard || ''); } catch {}
+
+    if (!text || text.length < 3) {
+      console.log('No selection detected and clipboard empty/too short');
       if (floatWindow && !floatWindow.isDestroyed()) {
         floatWindow.webContents.send('hide-loading');
-        floatWindow.webContents.send('show-tooltip', 'Copy some text first (Ctrl+C), then click to translate');
+        floatWindow.webContents.send('show-tooltip', 'Select text in any app, then click the button');
       }
       return;
     }
-    
-    console.log('Using clipboard text for translation:', text.substring(0, 100) + '...');
 
-    // Store the text for translation
+    console.log('Using text for translation:', text.substring(0, 100) + (text.length > 100 ? '...' : ''));
     selectedTextForTranslation = text;
-    console.log('Stored text for translation, length:', text.length);
 
-    // Hide loading state on float button
     if (floatWindow && !floatWindow.isDestroyed()) {
       floatWindow.webContents.send('hide-loading');
     }
 
     // Show language picker window and detect language
-    console.log('Creating language picker window...');
     await createLanguagePickerWindowWithDetection();
-    console.log('Language picker window creation completed');
-
   } catch (error) {
     console.error('Translation setup error:', error);
-    
-    // Hide loading state
     if (floatWindow && !floatWindow.isDestroyed()) {
       floatWindow.webContents.send('hide-loading');
-    }
-
-    // Show error
-    if (floatWindow && !floatWindow.isDestroyed()) {
-      floatWindow.webContents.send('show-tooltip', 'Failed to get clipboard text. Please try again.');
+      floatWindow.webContents.send('show-tooltip', 'Could not read selected text. Try selecting text and clicking again.');
     }
   }
+}
+
+/**
+ * Wait for clipboard text to change compared to a baseline hash, up to timeoutMs.
+ */
+function waitForClipboardChange(beforeHash: string, timeoutMs: number): Promise<string | null> {
+  return new Promise((resolve) => {
+    const start = Date.now();
+    const interval = setInterval(() => {
+      const current = clipboard.readText();
+      const currentHash = hashString(current || '');
+      if (currentHash !== beforeHash && (current || '').length > 0) {
+        clearInterval(interval);
+        resolve(current);
+      } else if (Date.now() - start > timeoutMs) {
+        clearInterval(interval);
+        resolve(null);
+      }
+    }, 120);
+  });
+}
+
+function hashString(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0; // Convert to 32bit int
+  }
+  return String(hash);
 }
 
 /**
