@@ -1,4 +1,5 @@
 import { app, BrowserWindow, globalShortcut, Tray, Menu, screen, clipboard, ipcMain, shell, dialog, nativeImage } from 'electron';
+import { URL } from 'url';
 import { join } from 'path';
 import Store from 'electron-store';
 import * as keytar from 'keytar';
@@ -22,6 +23,7 @@ let resultWindow: BrowserWindow | null = null;
 let languagePickerWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let isQuitting = false;
+let pendingDeepLink: string | null = null;
 
 // Store selected text for translation
 let selectedTextForTranslation = '';
@@ -36,7 +38,6 @@ const store = new Store({
     sourceLanguage: 'auto',
     showNotifications: true,
     keepTranslationHistory: true,
-    buttonVisible: true,
   }
 });
 
@@ -406,45 +407,26 @@ async function performTranslation(text: string, fromLang: string = 'auto', toLan
   }
 }
 
-/**
- * Toggle floating button visibility
- */
-function toggleFloatingButton(): void {
-  const buttonVisible = store.get('buttonVisible') as boolean;
-  
-  if (buttonVisible) {
-    // Hide the button
-    if (floatWindow && !floatWindow.isDestroyed()) {
-      floatWindow.hide();
-    }
-    store.set('buttonVisible', false);
-  } else {
-    // Show the button
-    if (floatWindow && !floatWindow.isDestroyed()) {
-      floatWindow.show();
-    } else {
-      createFloatWindow();
-    }
-    store.set('buttonVisible', true);
-  }
-  
-  // Update tray menu
-  updateTrayMenu();
-}
+
 
 /**
- * Update tray context menu
+ * Create tray context menu
  */
-function updateTrayMenu(): void {
+function createTrayMenu(): void {
   if (!tray) return;
   
-  const buttonVisible = store.get('buttonVisible') as boolean;
-  
   const contextMenu = Menu.buildFromTemplate([
-    ...(buttonVisible ? [] : [{
-      label: 'Show Floating Button',
-      click: toggleFloatingButton
-    }, { type: 'separator' }]),
+    {
+      label: 'Open TranslateSutra',
+      click: () => {
+        if (floatWindow && !floatWindow.isDestroyed()) {
+          floatWindow.show();
+        } else {
+          createFloatWindow();
+        }
+      }
+    },
+    { type: 'separator' },
     {
       label: 'Settings',
       click: () => {
@@ -472,7 +454,11 @@ function updateTrayMenu(): void {
   tray.setContextMenu(contextMenu);
 
   tray.on('click', () => {
-    toggleFloatingButton();
+    if (floatWindow && !floatWindow.isDestroyed()) {
+      floatWindow.show();
+    } else {
+      createFloatWindow();
+    }
   });
 }
 
@@ -493,7 +479,7 @@ function createTray(): void {
     tray = new Tray(emptyIcon);
   }
   
-  updateTrayMenu();
+  createTrayMenu();
 }
 
 /**
@@ -515,12 +501,33 @@ function registerShortcuts(): void {
 /**
  * App event handlers
  */
-app.whenReady().then(() => {
-  // Only show floating button if it's enabled in settings
-  const buttonVisible = store.get('buttonVisible') as boolean;
-  if (buttonVisible) {
-    createFloatWindow();
+// Ensure single instance to route deep links properly
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+}
+
+app.on('second-instance', (_event, argv) => {
+  // Windows: protocol URL will be in argv on second instance
+  const deeplinkArg = argv.find(a => a.startsWith('translatesutra://'));
+  if (deeplinkArg) {
+    handleDeepLink(deeplinkArg);
   }
+});
+
+// macOS: open-url event
+app.on('open-url', (_event, urlStr) => {
+  handleDeepLink(urlStr);
+});
+
+app.whenReady().then(() => {
+  // Register custom protocol (works best in packaged app)
+  try {
+    app.setAsDefaultProtocolClient('translatesutra');
+  } catch (e) {
+    console.log('Protocol registration failed (dev mode likely):', e);
+  }
+  createFloatWindow();
   
   try {
     createTray();
@@ -530,11 +537,24 @@ app.whenReady().then(() => {
   registerShortcuts();
 
   app.on('activate', () => {
-    const buttonVisible = store.get('buttonVisible') as boolean;
-    if (buttonVisible && BrowserWindow.getAllWindows().length === 0) {
+    if (BrowserWindow.getAllWindows().length === 0) {
       createFloatWindow();
     }
   });
+
+  // If app was launched with a deeplink (Windows first run), parse it
+  if (process.platform === 'win32') {
+    const deeplinkArg = process.argv.find(a => a.startsWith('translatesutra://'));
+    if (deeplinkArg) {
+      pendingDeepLink = deeplinkArg;
+      setTimeout(() => {
+        if (pendingDeepLink) {
+          handleDeepLink(pendingDeepLink);
+          pendingDeepLink = null;
+        }
+      }, 500);
+    }
+  }
 });
 
 app.on('window-all-closed', () => {
@@ -586,9 +606,9 @@ ipcMain.handle('pin-result-window', () => {
   return false;
 });
 
-ipcMain.handle('toggle-floating-button', () => {
-  toggleFloatingButton();
-  return store.get('buttonVisible');
+ipcMain.handle('close-app', () => {
+  isQuitting = true;
+  app.quit();
 });
 
 ipcMain.handle('hide-float-window', () => {
@@ -740,3 +760,53 @@ ipcMain.handle('start-translation', async (event, data: { text: string; from?: s
 
 // Export for testing
 export { createFloatWindow, createResultWindow };
+
+/**
+ * Handle translatesutra:// deep links
+ * Supported:
+ * - translatesutra://open
+ * - translatesutra://translate?text=Hello%20world&to=es&from=en
+ */
+function handleDeepLink(urlStr: string) {
+  try {
+    const url = new URL(urlStr);
+    const action = url.hostname || 'open';
+    if (action === 'open') {
+      if (floatWindow && !floatWindow.isDestroyed()) {
+        floatWindow.show();
+      } else {
+        createFloatWindow();
+      }
+      return;
+    }
+
+    if (action === 'translate') {
+      const text = decodeURIComponent(url.searchParams.get('text') || '');
+      const to = url.searchParams.get('to') || 'en';
+      const from = url.searchParams.get('from') || 'auto';
+      if (text && text.trim().length > 0) {
+        selectedTextForTranslation = text;
+        // Show language picker with provided defaults, then translate
+        createLanguagePickerWindow();
+        performTranslation(text, from, to);
+      } else {
+        // No text provided, just focus the app
+        if (floatWindow && !floatWindow.isDestroyed()) {
+          floatWindow.show();
+        } else {
+          createFloatWindow();
+        }
+      }
+      return;
+    }
+
+    // Unknown action: just bring app to front
+    if (floatWindow && !floatWindow.isDestroyed()) {
+      floatWindow.show();
+    } else {
+      createFloatWindow();
+    }
+  } catch (err) {
+    console.error('Failed to handle deep link:', urlStr, err);
+  }
+}

@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initializeNavigation();
   initializeScrollEffects();
   initializeAnimations();
+  initializeDeepLinkButton();
   
   // Initialize OS detection from os-detect.js
   if (window.OSDetection) {
@@ -275,11 +276,46 @@ function throttle(func, limit) {
   };
 }
 
+// Deep link: try to open the desktop app, fallback to download if not installed
+function initializeDeepLinkButton() {
+  const btn = document.getElementById('openInApp');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    tryOpenAppOrDownload();
+  });
+}
+
+function tryOpenAppOrDownload() {
+  const deeplink = 'translatesutra://open';
+  // Fallback to whatever the primary download button links to
+  const primary = document.getElementById('primaryDownload');
+  const fallback = (primary && primary.href) ? primary.href : 'https://github.com/hieabhi/translatesutra/releases';
+
+  // Attempt to open the app via custom protocol
+  const start = Date.now();
+  // Some browsers require assigning to location; others can use hidden iframe
+  let attempted = false;
+  try {
+    window.location.href = deeplink;
+    attempted = true;
+  } catch (_) {}
+
+  // After a short delay, if we're still on the page, assume protocol failed
+  setTimeout(() => {
+    const elapsed = Date.now() - start;
+    // If document is still visible and we didn't switch away, fallback
+    if (!document.hidden || elapsed < 2000) {
+      window.location.href = fallback;
+    }
+  }, 1200);
+}
+
 // Export functions for use in other scripts
 window.TranslateSutraApp = {
   showNotification,
   trackEvent,
   handleFormSubmission,
   debounce,
-  throttle
+  throttle,
+  tryOpenAppOrDownload
 };

@@ -25,6 +25,12 @@
     "directories": {
       "output": "release"
     },
+    "protocols": [
+      {
+        "name": "TranslateSutra Protocol",
+        "schemes": ["translatesutra"]
+      }
+    ],
     "files": [
       "dist/**/*",
       "src/renderer/**/*",
