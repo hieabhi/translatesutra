@@ -264,8 +264,14 @@ function setupDownloadListeners() {
       // Prefer data-url (dynamic) else fall back to the element's href
       const dataUrl = button.getAttribute('data-url');
       const hrefUrl = (button instanceof HTMLAnchorElement) ? button.getAttribute('href') : null;
+      const isAbsolute = hrefUrl && /^(https?:)?\/\//i.test(hrefUrl);
       const url = dataUrl || hrefUrl;
       const filename = button.getAttribute('data-filename') || 'TranslateSutra.zip';
+
+      // If anchor already points to an absolute URL, let the browser handle it (no JS interception)
+      if (isAbsolute && button instanceof HTMLAnchorElement) {
+        return; // allow default navigation
+      }
 
       if (url) {
         // If we handle programmatically, prevent default to avoid double navigation
