@@ -135,6 +135,10 @@ function updateOSDetection() {
         button.setAttribute('data-platform', osInfo.platform);
         button.setAttribute('data-filename', primaryDownload.filename);
         button.setAttribute('data-url', primaryDownload.url);
+        // If this is an anchor tag, also set href so native navigation works
+        if (button.tagName && button.tagName.toLowerCase() === 'a') {
+          try { button.setAttribute('href', primaryDownload.url); } catch (_) {}
+        }
       }
     }
   });
@@ -157,31 +161,22 @@ function updateOSDetection() {
 function handleDownload(url, filename) {
   // Track download analytics (in production)
   console.log('Download started:', { url, filename });
-
-  // Check if release exists, if not redirect to GitHub with instructions
-  fetch(url, { method: 'HEAD' })
-    .then(response => {
-      if (response.ok) {
-        // Release exists, proceed with download
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        link.style.display = 'none';
-        
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        showDownloadNotification(filename);
-      } else {
-        // Release doesn't exist yet, redirect to GitHub
-        showBuildInstructions();
-      }
-    })
-    .catch(() => {
-      // Network error or release doesn't exist, redirect to GitHub
-      showBuildInstructions();
-    });
+  // IMPORTANT: Avoid cross-origin HEAD checks (blocked by CORS on GitHub assets).
+  // Navigate directly to the asset URL so the browser handles the download.
+  try {
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    if (filename) a.download = filename; // ignored cross-origin but harmless
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch (err) {
+    // Fallback to location change
+    window.location.href = url;
+  }
+  showDownloadNotification(filename || 'TranslateSutra');
 }
 
 // Show build instructions when releases aren't available
@@ -265,17 +260,23 @@ function setupDownloadListeners() {
   const downloadButtons = document.querySelectorAll('.download-btn');
   downloadButtons.forEach(button => {
     button.addEventListener('click', (e) => {
-      e.preventDefault();
-      
-      const url = button.getAttribute('data-url');
-      const filename = button.getAttribute('data-filename');
-      
-      if (url && filename) {
-        handleDownload(url, filename);
-      } else {
-        console.error('Download URL or filename not found');
-        alert('Download not available. Please try again later.');
+      // Prefer data-url (dynamic) else fall back to the element's href
+      const dataUrl = button.getAttribute('data-url');
+      const hrefUrl = (button instanceof HTMLAnchorElement) ? button.getAttribute('href') : null;
+      const isAbsolute = hrefUrl && /^(https?:)?\/\//i.test(hrefUrl);
+      const url = dataUrl || hrefUrl;
+      const filename = button.getAttribute('data-filename') || 'TranslateSutra.zip';
+
+      // If anchor already points to an absolute URL, let the browser handle it (no JS interception)
+      if (isAbsolute && button instanceof HTMLAnchorElement) {
+        return; // allow default navigation
       }
+
+      if (url) {
+        // If we handle programmatically, prevent default to avoid double navigation
+        e.preventDefault();
+        handleDownload(url, filename);
+      } // else allow default behavior if any
     });
   });
 
